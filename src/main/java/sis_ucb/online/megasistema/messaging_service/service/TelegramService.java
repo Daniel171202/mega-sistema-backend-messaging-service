@@ -34,28 +34,19 @@ public class TelegramService {
     }
 
     public void sendBatch(List<String> identifiers, String text) {
-        for (String identifier : identifiers) {
+        identifiers.parallelStream().forEach(identifier -> {
             SendMessage msg = SendMessage.builder()
-                    .chatId(identifier.toString())
+                    .chatId(identifier)
                     .text(text)
                     .build();
 
-            // Ahora sí podemos llamar a execute()
             try {
                 telegramClient.execute(msg);
             } catch (TelegramApiException e) {
-                // TODO Auto-generated catch block
-                System.out.println("Error al enviar el mensaje: " + e.getMessage());
+                System.out.println("Error al enviar el mensaje a " + identifier + ": " + e.getMessage());
                 e.printStackTrace();
             }
-        }
-        // Aquí podrías manejar el caso de que no se haya podido enviar el mensaje a alguno de los identificadores
-        // por ejemplo, guardando los identificadores fallidos en una lista y retornándola
-        // o lanzando una excepción personalizada.
-        // return failedIdentifiers;
-        // return null;
-
-
+        });
     }
     
 }
